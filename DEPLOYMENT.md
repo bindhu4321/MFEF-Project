@@ -3,7 +3,9 @@
 The root `vercel.json` deploys the frontend and API as two Vercel services in
 one project. Import the repository in Vercel with the repository root (`./`) as
 the project root. Vercel routes `/api/*` to the Express backend and other paths
-to the Vite frontend.
+to the Vite frontend. The frontend service rewrites application routes to
+`index.html`, so direct navigation and refreshes on routes such as `/login`
+load the single-page app.
 
 Vercel does not host this project's MySQL database. Configure the backend
 service's environment variables in the Vercel project using the connection

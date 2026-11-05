@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  base: '/MFEF-project-major-/',
+  base: process.env.VERCEL ? '/' : '/MFEF-project-major-/',
   plugins: [react()],
   server: {
     port: 5173,

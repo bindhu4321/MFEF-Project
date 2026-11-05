@@ -18,9 +18,18 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PAGES_DEPLOY_TOKEN: ${{ secrets.PAGES_DEPLOY_TOKEN }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Enable GitHub Pages
+        if: ${{ env.PAGES_DEPLOY_TOKEN != '' }}
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+          token: ${{ env.PAGES_DEPLOY_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

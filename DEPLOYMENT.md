@@ -5,9 +5,15 @@ Pages whenever changes are pushed to `main`.
 
 ## Enable GitHub Pages
 
-In the repository on GitHub, open **Settings → Pages** and set **Build and
-deployment → Source** to **GitHub Actions**. The workflow will then publish the
-site. Open:
+The workflow can enable Pages automatically if the repository has a
+`PAGES_DEPLOY_TOKEN` Actions secret. Create a fine-grained personal access token
+with Pages write permission (or a classic token with the `repo` scope), then
+add it under **Settings → Secrets and variables → Actions** as
+`PAGES_DEPLOY_TOKEN`. The workflow uses it only to enable Pages.
+
+Alternatively, open **Settings → Pages** and set **Build and deployment →
+Source** to **GitHub Actions** yourself. This is required if the secret is not
+configured. After Pages is enabled, the workflow publishes the site. Open:
 
 <https://bindhu4321.github.io/MFEF-project-major-/>
 

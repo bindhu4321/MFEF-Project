@@ -1,23 +1,23 @@
-# Live frontend deployment
+# GitHub Pages deployment
 
-Deploy the frontend with Vercel:
+The workflow builds the frontend and publishes it to GitHub Pages when changes
+are pushed to `main`.
 
-1. Sign in to [Vercel](https://vercel.com/) and choose **Add New → Project**.
-2. Import the `bindhu4321/MFEF-project-major-` repository.
-3. Set **Root Directory** to `frontend`.
-4. Use the Vite defaults: build command `npm run build`, output directory
-   `dist`, and install command `npm install`.
-5. Deploy. Vercel will provide a public `*.vercel.app` URL.
+## Enable GitHub Pages
 
-`frontend/vercel.json` sends app routes to the React entry point so direct links
-and refreshes work.
+In the repository, open **Settings → Pages** and set **Build and deployment →
+Source** to **GitHub Actions**. Then rerun the latest deployment in the
+**Actions** tab if needed.
 
-## Backend requirements
+The workflow can also try to enable Pages when an Actions secret named
+`PAGES_DEPLOY_TOKEN` is configured with Pages write permission. Without that
+secret, Pages must be enabled in repository settings.
 
-Vercel hosts the frontend only. Sign-in and financial data require the Express
-backend and MySQL database to be hosted separately. Set `VITE_API_URL` in the
-Vercel project to the public HTTPS backend URL ending in `/api`, and configure
-the backend CORS allowlist to include the Vercel site URL.
+After a successful deployment, open:
 
-Until a backend is configured, the site can load but API-dependent features
-will not work.
+<https://bindhu4321.github.io/MFEF-project-major-/>
+
+GitHub Pages hosts static files only. Sign-in and live financial data require
+the Express backend and MySQL database to be hosted separately. Set
+`VITE_API_URL` to the public HTTPS backend URL ending in `/api`, and configure
+backend CORS to allow the Pages site URL.

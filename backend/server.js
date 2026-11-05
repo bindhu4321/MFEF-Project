@@ -96,19 +96,19 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server (HTTPS if configured, else standard HTTP)
-const secureServer = createSecureServer(app);
+if (require.main === module) {
+  const secureServer = createSecureServer(app);
 
-if (secureServer) {
-  secureServer.listen(PORT, () => {
-    console.log(`[Server] Secure HTTPS server running on port ${PORT}`);
-  });
-} else {
-  app.listen(PORT, () => {
-    console.log(`[Server] Small Business Finance REST API running on http://localhost:${PORT}`);
-    console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
+  if (secureServer) {
+    secureServer.listen(PORT, () => {
+      console.log(`[Server] Secure HTTPS server running on port ${PORT}`);
+    });
+  } else {
+    app.listen(PORT, () => {
+      console.log(`[Server] Small Business Finance REST API running on http://localhost:${PORT}`);
+      console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+  }
 }
 
 module.exports = app;
-

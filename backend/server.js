@@ -19,9 +19,14 @@ app.use(helmet({
 }));
 
 // CORS Configuration
-const allowedOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-  : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+const allowedOrigins = [
+  'https://small-business-finance-app.vercel.app',
+  'https://mfef-project-major-qn8y.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  ...(process.env.CORS_ORIGIN || '').split(',').map(origin => origin.trim()).filter(Boolean)
+];
 
 app.use(cors({
   origin: function (origin, callback) {

@@ -13,6 +13,11 @@ values from your hosted MySQL provider and unique production secrets from
 `backend/.env.example`. Do not use the example credentials. Initialize the
 database with `database/schema.sql`.
 
+The API allows the production frontend domains
+`small-business-finance-app.vercel.app` and `mfef-project-major-qn8y.vercel.app`
+for CORS. If you use another domain, add its full origin (including `https://`)
+to the backend's `CORS_ORIGIN` environment variable in Vercel.
+
 The frontend defaults to the same-origin `/api` path, so no `VITE_API_URL`
 setting is needed for this multi-service deployment. Redeploy after setting
 backend environment variables. The public `*.vercel.app` URL is available once

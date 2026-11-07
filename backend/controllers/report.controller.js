@@ -1,8 +1,13 @@
 const pool = require('../config/db');
+const { getDemoProfitLossReport, getDemoFinancialReport } = require('../utils/demoStore');
 
 // Profit and Loss Statement Calculation
 exports.getProfitAndLoss = async (req, res) => {
   try {
+    if (!pool.isDatabaseAvailable()) {
+      return res.status(200).json(getDemoProfitLossReport());
+    }
+
     const { year = new Date().getFullYear().toString(), month } = req.query;
     const isAdmin = req.user.role === 'admin';
     const viewAll = isAdmin && req.query.all === 'true';
@@ -157,6 +162,10 @@ exports.getProfitAndLoss = async (req, res) => {
 // Comprehensive Financial Report Generator (Monthly / Yearly)
 exports.getFinancialReport = async (req, res) => {
   try {
+    if (!pool.isDatabaseAvailable()) {
+      return res.status(200).json(getDemoFinancialReport());
+    }
+
     const { year = new Date().getFullYear().toString(), month } = req.query;
     const isAdmin = req.user.role === 'admin';
     const viewAll = isAdmin && req.query.all === 'true';

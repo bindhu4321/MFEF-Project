@@ -1,8 +1,13 @@
 const pool = require('../config/db');
+const { getDemoCashFlowSummary } = require('../utils/demoStore');
 
 // Cash Flow Analysis and Breakdown
 exports.getCashFlowSummary = async (req, res) => {
   try {
+    if (!pool.isDatabaseAvailable()) {
+      return res.status(200).json(getDemoCashFlowSummary());
+    }
+
     const { year, startDate, endDate } = req.query;
     const isAdmin = req.user.role === 'admin';
     const viewAll = isAdmin && req.query.all === 'true';

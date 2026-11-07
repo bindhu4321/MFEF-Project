@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { getDemoUserById, buildUserPublicProfile } = require('../utils/demoStore');
 
 // Verify JWT token from Authorization header
 const authenticateToken = async (req, res, next) => {
@@ -18,7 +19,19 @@ const authenticateToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sbfms_jwt_super_secure_secret_key_2026_antigravity');
 
-    // Fetch user from DB to ensure user still exists and role is current
+    if (!pool.isDatabaseAvailable()) {
+      const demoUser = getDemoUserById(decoded.id);
+      if (!demoUser) {
+        return res.status(401).json({
+          success: false,
+          message: 'User belonging to this token no longer exists.'
+        });
+      }
+
+      req.user = buildUserPublicProfile(demoUser);
+      return next();
+    }
+
     const [rows] = await pool.query(
       'SELECT id, name, email, role, business_name, phone FROM users WHERE id = ?',
       [decoded.id]

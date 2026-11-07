@@ -23,6 +23,7 @@ const loginValidation = [
 router.post('/register', registerValidation, authController.register);
 router.post('/login', loginValidation, authController.login);
 router.get('/me', authenticateToken, authController.getMe);
+router.get('/profile', authenticateToken, authController.getMe);
 router.put('/profile', authenticateToken, authController.updateProfile);
 router.put('/change-password', authenticateToken, authController.changePassword);
 

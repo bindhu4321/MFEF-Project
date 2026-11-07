@@ -1,9 +1,14 @@
 const pool = require('../config/db');
+const { getDemoDashboardMetrics } = require('../utils/demoStore');
 
 // User Dashboard Summary Metrics
 exports.getUserDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    if (!pool.isDatabaseAvailable()) {
+      return res.status(200).json(getDemoDashboardMetrics());
+    }
 
     // 1. Total Revenue
     const [revResult] = await pool.query(

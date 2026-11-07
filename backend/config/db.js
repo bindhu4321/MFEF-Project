@@ -16,16 +16,22 @@ const pool = mysql.createPool({
   dateStrings: true // Return date as YYYY-MM-DD instead of JavaScript Date UTC shift
 });
 
-// Test connection on boot
-(async () => {
+let databaseReady = false;
+
+const checkDatabaseConnection = async () => {
   try {
     const connection = await pool.getConnection();
-    console.log(`[Database] Successfully connected to MySQL database: ${process.env.DB_NAME}`);
+    databaseReady = true;
+    console.log(`[Database] Successfully connected to MySQL database: ${process.env.DB_NAME || 'small_business_finance'}`);
     connection.release();
   } catch (error) {
-    console.error('[Database] Connection failed:', error.message);
+    databaseReady = false;
+    console.warn('[Database] MySQL unavailable. Falling back to demo mode for login and dashboard flows.');
   }
-})();
+};
+
+checkDatabaseConnection();
+pool.isDatabaseAvailable = () => databaseReady;
 
 module.exports = pool;
 

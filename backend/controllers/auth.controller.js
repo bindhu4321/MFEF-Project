@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { getDemoUserByEmail, addDemoUser, buildUserPublicProfile, getDemoUserById } = require('../utils/demoStore');
 
 // Sign JWT token helper
 const generateToken = (user) => {
@@ -14,6 +15,17 @@ const generateToken = (user) => {
     process.env.JWT_SECRET || 'sbfms_jwt_super_secure_secret_key_2026_antigravity',
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
+};
+
+const signInDemoUser = async (user, res) => {
+  const userData = buildUserPublicProfile(user);
+  const token = generateToken(userData);
+  return res.status(200).json({
+    success: true,
+    message: 'Login successful.',
+    token,
+    user: userData
+  });
 };
 
 // Register a new user
@@ -35,7 +47,37 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Check if email already exists
+    if (!pool.isDatabaseAvailable()) {
+      const normalizedEmail = String(email).trim().toLowerCase();
+      if (getDemoUserByEmail(normalizedEmail)) {
+        return res.status(409).json({
+          success: false,
+          message: 'A user with this email address already exists.'
+        });
+      }
+
+      const nextId = Date.now();
+      const newUser = {
+        id: nextId,
+        name: name.trim(),
+        email: normalizedEmail,
+        password: await bcrypt.hash(password, 10),
+        role: 'user',
+        business_name: business_name ? business_name.trim() : null,
+        phone: phone ? phone.trim() : null
+      };
+
+      addDemoUser(newUser);
+
+      const token = generateToken(newUser);
+      return res.status(201).json({
+        success: true,
+        message: 'User registered successfully.',
+        token,
+        user: buildUserPublicProfile(newUser)
+      });
+    }
+
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase().trim()]);
     if (existing.length > 0) {
       return res.status(409).json({
@@ -44,7 +86,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -102,6 +143,26 @@ exports.login = async (req, res) => {
       });
     }
 
+    if (!pool.isDatabaseAvailable()) {
+      const demoUser = getDemoUserByEmail(email);
+      if (!demoUser) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password.'
+        });
+      }
+
+      const isMatch = await bcrypt.compare(password, demoUser.password);
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password.'
+        });
+      }
+
+      return signInDemoUser(demoUser, res);
+    }
+
     const [rows] = await pool.query(
       'SELECT id, name, email, password, role, business_name, phone, created_at FROM users WHERE email = ?',
       [email.toLowerCase().trim()]
@@ -116,7 +177,6 @@ exports.login = async (req, res) => {
 
     const user = rows[0];
 
-    // Compare bcrypt password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({

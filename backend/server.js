@@ -6,6 +6,11 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { validateApiKey, requireApiKey } = require('./middleware/apiKey.middleware');
 const { createSecureServer } = require('./config/certs');
+const { authenticateToken } = require('./middleware/auth.middleware');
+const authController = require('./controllers/auth.controller');
+const userController = require('./controllers/user.controller');
+const reportController = require('./controllers/report.controller');
+const cashflowController = require('./controllers/cashflow.controller');
 
 // Load environment variables
 dotenv.config();
@@ -71,6 +76,13 @@ app.get('/api/verify-api-key', requireApiKey, (req, res) => {
     message: 'API Key is valid and authorized.'
   });
 });
+
+// Compatible route aliases for the project specification and existing frontend usage
+app.get('/api/auth/profile', authenticateToken, authController.getMe);
+app.get('/api/dashboard/summary', authenticateToken, userController.getUserDashboard);
+app.get('/api/dashboard/charts', authenticateToken, userController.getUserDashboard);
+app.get('/api/reports/financial-summary', authenticateToken, reportController.getFinancialReport);
+app.get('/api/reports/cash-flow', authenticateToken, cashflowController.getCashFlowSummary);
 
 // Mount Application Routes
 app.use('/api/auth', require('./routes/auth.routes'));

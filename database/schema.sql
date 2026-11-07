@@ -81,3 +81,35 @@ CREATE TABLE IF NOT EXISTS `investments` (
   INDEX `idx_investments_date` (`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 5. Financial Categories Table
+CREATE TABLE IF NOT EXISTS `financial_categories` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `type` ENUM('revenue', 'expense', 'investment') NOT NULL,
+  `name` VARCHAR(80) NOT NULL,
+  `description` TEXT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  UNIQUE KEY `uniq_category_user_type_name` (`user_id`, `type`, `name`),
+  INDEX `idx_financial_categories_user_type` (`user_id`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 6. Transactions Table
+CREATE TABLE IF NOT EXISTS `transactions` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `type` ENUM('revenue', 'expense', 'investment') NOT NULL,
+  `reference_id` INT NULL,
+  `category_id` INT NULL,
+  `amount` DECIMAL(12, 2) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `transaction_date` DATE NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`category_id`) REFERENCES `financial_categories`(`id`) ON DELETE SET NULL,
+  INDEX `idx_transactions_user_type_date` (`user_id`, `type`, `transaction_date`),
+  INDEX `idx_transactions_category` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+

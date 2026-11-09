@@ -1,11 +1,11 @@
 -- Small Business Financial Management System
 -- Database Schema: small_business_finance
 
-CREATE DATABASE IF NOT EXISTS `small_business_finance` 
+CREATE DATABASE IF NOT EXISTS `mfef_db` 
 CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
-USE `small_business_finance`;
+USE `mfef_db`;
 
 -- 1. Users Table
 CREATE TABLE IF NOT EXISTS `users` (

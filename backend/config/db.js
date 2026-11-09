@@ -1,19 +1,29 @@
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config({
+  path: path.join(__dirname, '..', '.env')
+});
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'small_business_finance',
-  port: Number(process.env.DB_PORT) || 3306,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: Number(process.env.DB_PORT || 4000),
+
+  ssl: {
+    ca: fs.readFileSync(
+      path.join(__dirname, '..', 'certs', 'ca.pem')
+    )
+  },
+
   waitForConnections: true,
-  connectionLimit: Number(process.env.DB_CONNECTION_LIMIT) || 10,
+  connectionLimit: 10,
   queueLimit: 0,
-  dateStrings: true // Return date as YYYY-MM-DD instead of JavaScript Date UTC shift
+  dateStrings: true
 });
 
 let databaseReady = false;
@@ -21,17 +31,21 @@ let databaseReady = false;
 const checkDatabaseConnection = async () => {
   try {
     const connection = await pool.getConnection();
+
     databaseReady = true;
-    console.log(`[Database] Successfully connected to MySQL database: ${process.env.DB_NAME || 'small_business_finance'}`);
+
+    console.log('[Database] Successfully connected to TiDB Cloud');
+
     connection.release();
   } catch (error) {
     databaseReady = false;
-    console.warn('[Database] MySQL unavailable. Falling back to demo mode for login and dashboard flows.');
+
+    console.error('[Database] Connection failed:', error.message);
   }
 };
 
 checkDatabaseConnection();
+
 pool.isDatabaseAvailable = () => databaseReady;
 
 module.exports = pool;
-
